@@ -6,10 +6,10 @@ public class GamePanel extends JPanel {
     private Food food;
     private SwingRenderer renderer;
 
-    public GamePanel(Snake snake, Food food, SwingRenderer renderer) {
+    public GamePanel(Snake snake, Food food, Renderer renderer2) {
         this.snake = snake;
         this.food = food;
-        this.renderer = renderer;
+        this.renderer = (SwingRenderer) renderer2;
         setPreferredSize(new Dimension(400, 400));
     }
 

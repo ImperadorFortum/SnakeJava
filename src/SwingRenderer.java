@@ -4,7 +4,7 @@ import java.awt.image.*;
 import java.io.*;
 import javax.imageio.ImageIO;
 
-public class SwingRenderer  {
+public class SwingRenderer implements Renderer {
     
     private BufferedImage corpoSprite;
     private BufferedImage macaSprite;
@@ -55,4 +55,9 @@ public class SwingRenderer  {
             }).start();
         });
     }
+
+    @Override
+public void draw(Snake snake, Food food) {
+    // Método vazio para cumprir a interface Renderer
+}
 }

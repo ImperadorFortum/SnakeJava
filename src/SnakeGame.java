@@ -1,20 +1,15 @@
-public class SnakeGameApp {
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> {
-            Renderer renderer = new SwingRenderer();
-            SnakeGame game = new SnakeGame(renderer, 120); // 120 = tempo de atualização em ms
-            game.start();
-        });
-    }
 
-    public class SnakeGame extends Game {
+
+public class SnakeGame extends Game {
     private Snake snake;
     private Food food;
     private Renderer renderer;
     private boolean running = true;
+    private int updateInterval;
 
     public SnakeGame(Renderer renderer) {
         this.renderer = renderer;
+        this.updateInterval = 120; // valor padrão, se desejar
     }
     public SnakeGame(Renderer renderer, int updateInterval) {
         this.renderer = renderer;
@@ -27,10 +22,14 @@ public class SnakeGameApp {
 
     protected void handleInput() { 
         // Lógica para capturar e processar entrada do usuário
-        
     }
 
     protected void update() {
+        try {
+            Thread.sleep(updateInterval); // controla o tempo de atualização
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
         snake.move();
         if (snake.getHead().equals(food.getPosition())) {
             snake.grow();

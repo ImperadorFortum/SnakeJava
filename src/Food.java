@@ -1,4 +1,6 @@
 import java.util.Random;
+import java.awt.Point;
+
 
 public class Food {
     private Point position;

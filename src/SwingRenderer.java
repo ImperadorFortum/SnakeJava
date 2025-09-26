@@ -1,6 +1,7 @@
 public class SwingRenderer implements Renderer {
     public void draw(Snake snake, Food food) {
-        // A adicionar lógica de desenho usando Swing
-        System.out.println("Preparando...");
+        // Exemplo simples: imprime posições no console
+        System.out.println("Cobra: " + snake.getHead());
+        System.out.println("Comida: " + food.getPosition());
     }
 }

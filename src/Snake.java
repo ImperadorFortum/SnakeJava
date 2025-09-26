@@ -1,4 +1,5 @@
 import java.util.*;
+import java.awt.Point;
 
 public class Snake {
     private List<Point> body;

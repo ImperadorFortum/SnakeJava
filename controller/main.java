@@ -1,8 +1,9 @@
 import javax.swing.SwingUtilities;
 import javax.swing.JFrame;
+import java.awt.Point;
 
 public class main {
-    public main(String[] args) {
+    public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
             Renderer renderer = new SwingRenderer();
             Snake snake = new Snake();
@@ -13,20 +14,38 @@ public class main {
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             frame.add(panel);
             frame.pack();
+            frame.setLocationRelativeTo(null); // Centralizar janela
             frame.setVisible(true);
 
-            // Loop simples para atualizar o painel e mover a cobra
+            // Loop do jogo com lógica de colisão e crescimento
             new Thread(() -> {
                 while (true) {
+                    // Mover a cobra
                     snake.move();
+                    
+                    // Verificar se a cobra comeu a maçã
+                    Point head = snake.getHead();
+                    Point foodPos = food.getPosition();
+                    
+                    if (head.equals(foodPos)) {
+                        // Cobra comeu a maçã
+                        snake.grow();
+                        food.respawn();
+                        System.out.println("Maçã comida! Tamanho da cobra: " + snake.getBody().size());
+                    }
+                    
+                    // Atualizar o painel
                     panel.repaint();
+                    
                     try {
-                        Thread.sleep(120);
+                        Thread.sleep(200); // Velocidade do jogo (200ms = mais lento, mais fácil de testar)
                     } catch (InterruptedException e) {
                         Thread.currentThread().interrupt();
+                        break;
                     }
                 }
             }).start();
         });
     }
 }
+

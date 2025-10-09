@@ -1,0 +1,8 @@
+{
+    "java.project.sourcePaths": [
+        "src",
+        "controller"
+    ],
+    "java.project.outputPath": "bin"
+}
+

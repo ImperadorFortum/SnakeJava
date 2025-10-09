@@ -32,7 +32,12 @@ public class Snake {
         return body;
     }
 
-    public void setDirection(Direction d) {
-        this.direction = d;
+    public void setDirection(Direction newDirection) {
+    if ((direction == Direction.RIGHT && newDirection != Direction.LEFT) ||
+        (direction == Direction.LEFT && newDirection != Direction.RIGHT) ||
+        (direction == Direction.UP && newDirection != Direction.DOWN) ||
+        (direction == Direction.DOWN && newDirection != Direction.UP)) {
+        this.direction = newDirection;
     }
 }
+    }

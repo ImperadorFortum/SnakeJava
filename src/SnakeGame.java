@@ -11,10 +11,12 @@ public abstract class SnakeGame extends Game {
         this.renderer = renderer;
         this.updateInterval = 120; // valor padrão, se desejar
     }
+    
     public SnakeGame(Renderer renderer, int updateInterval) {
         this.renderer = renderer;
         this.updateInterval = updateInterval;
     }
+    
     protected void setup() {
         snake = new Snake();
         food = new Food();
@@ -38,8 +40,8 @@ public abstract class SnakeGame extends Game {
     }
 
     public void paintComponent(Graphics g) {
-    super.paintComponent(g);
-    renderer.draw(snake, food, g); //
+        // Renderizar o jogo
+        renderer.draw(snake, food, g);
     }
 
     protected boolean isGameOver() {
@@ -50,3 +52,4 @@ public abstract class SnakeGame extends Game {
         System.out.println("Fim de jogo!");
     }
 }
+

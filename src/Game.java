@@ -17,9 +17,5 @@ public abstract class Game {
     protected abstract void render();
     protected abstract boolean isGameOver();
     protected abstract void gameOver();
-
-    protected void paintComponent(Graphics g) {
-       
-        throw new UnsupportedOperationException("Unimplemented method 'paintComponent'");
-    }
 }
+

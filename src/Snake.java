@@ -33,11 +33,36 @@ public class Snake {
     }
 
     public void setDirection(Direction newDirection) {
-    if ((direction == Direction.RIGHT && newDirection != Direction.LEFT) ||
-        (direction == Direction.LEFT && newDirection != Direction.RIGHT) ||
-        (direction == Direction.UP && newDirection != Direction.DOWN) ||
-        (direction == Direction.DOWN && newDirection != Direction.UP)) {
-        this.direction = newDirection;
+        if ((direction == Direction.RIGHT && newDirection != Direction.LEFT) ||
+            (direction == Direction.LEFT && newDirection != Direction.RIGHT) ||
+            (direction == Direction.UP && newDirection != Direction.DOWN) ||
+            (direction == Direction.DOWN && newDirection != Direction.UP)) {
+            this.direction = newDirection;
+        }
+    }
+    
+    // Verifica se a cobra colidiu com ela mesma
+    public boolean checkSelfCollision() {
+        Point head = getHead();
+        // Verifica se a cabeça está na mesma posição de algum segmento do corpo
+        for (int i = 1; i < body.size(); i++) {
+            if (head.equals(body.get(i))) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    // Verifica se a cobra colidiu com as paredes
+    public boolean checkWallCollision() {
+        Point head = getHead();
+        // As paredes estão nas bordas: x=0, x=19, y=0, y=19
+        return head.x <= 0 || head.x >= 19 || head.y <= 0 || head.y >= 19;
+    }
+    
+    // Verifica qualquer tipo de colisão (parede ou próprio corpo)
+    public boolean checkCollision() {
+        return checkWallCollision() || checkSelfCollision();
     }
 }
-    }
+

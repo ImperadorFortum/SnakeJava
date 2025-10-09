@@ -9,12 +9,16 @@ public class SwingRenderer implements Renderer {
     
     private BufferedImage corpoSprite;
     private BufferedImage macaSprite;
+    private BufferedImage paredeSprite;
+    private BufferedImage fundoSprite;
 
     public SwingRenderer() {
         try {
             // Tentar múltiplas estratégias para encontrar os sprites
             corpoSprite = loadImage("Corpo.png");
             macaSprite = loadImage("Maçã.png");
+            paredeSprite = loadImage("Parede.png");
+            fundoSprite = loadImage("Fundo.png");
             
             if (corpoSprite != null && macaSprite != null) {
                 System.out.println("✓ Sprites carregados com sucesso!");
@@ -119,6 +123,55 @@ public class SwingRenderer implements Renderer {
 
     @Override
     public void draw(Snake snake, Food food, Graphics g) {
+        // Desenhar fundo
+        if (fundoSprite != null) {
+            for (int x = 0; x < 20; x++) {
+                for (int y = 0; y < 20; y++) {
+                    g.drawImage(fundoSprite, x * 20, y * 20, 20, 20, null);
+                }
+            }
+        } else {
+            g.setColor(new Color(34, 139, 34)); // Verde escuro
+            g.fillRect(0, 0, 400, 400);
+        }
+        
+        // Desenhar paredes ao redor do mapa
+        if (paredeSprite != null) {
+            // Parede superior
+            for (int x = 0; x < 20; x++) {
+                g.drawImage(paredeSprite, x * 20, 0, 20, 20, null);
+            }
+            // Parede inferior
+            for (int x = 0; x < 20; x++) {
+                g.drawImage(paredeSprite, x * 20, 19 * 20, 20, 20, null);
+            }
+            // Parede esquerda
+            for (int y = 0; y < 20; y++) {
+                g.drawImage(paredeSprite, 0, y * 20, 20, 20, null);
+            }
+            // Parede direita
+            for (int y = 0; y < 20; y++) {
+                g.drawImage(paredeSprite, 19 * 20, y * 20, 20, 20, null);
+            }
+        } else {
+            // Fallback: desenhar paredes cinzas
+            g.setColor(Color.DARK_GRAY);
+            g.fillRect(0, 0, 400, 20); // Superior
+            g.fillRect(0, 380, 400, 20); // Inferior
+            g.fillRect(0, 0, 20, 400); // Esquerda
+            g.fillRect(380, 0, 20, 400); // Direita
+        }
+        
+        // Desenha a maçã
+        Point foodPos = food.getPosition();
+        if (macaSprite != null) {
+            g.drawImage(macaSprite, foodPos.x * 20, foodPos.y * 20, 20, 20, null);
+        } else {
+            // Fallback: desenhar círculo vermelho se a imagem não foi carregada
+            g.setColor(Color.RED);
+            g.fillOval(foodPos.x * 20, foodPos.y * 20, 20, 20);
+        }
+        
         // Desenha cada segmento da cobra
         for (Point pos : snake.getBody()) {
             if (corpoSprite != null) {
@@ -130,16 +183,6 @@ public class SwingRenderer implements Renderer {
                 g.setColor(Color.DARK_GRAY);
                 g.drawRect(pos.x * 20, pos.y * 20, 20, 20);
             }
-        }
-        
-        // Desenha a maçã
-        Point foodPos = food.getPosition();
-        if (macaSprite != null) {
-            g.drawImage(macaSprite, foodPos.x * 20, foodPos.y * 20, 20, 20, null);
-        } else {
-            // Fallback: desenhar círculo vermelho se a imagem não foi carregada
-            g.setColor(Color.RED);
-            g.fillOval(foodPos.x * 20, foodPos.y * 20, 20, 20);
         }
     }
 

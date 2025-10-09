@@ -37,8 +37,9 @@ public class SnakeGame extends Game {
         }
     }
 
-    protected void render() {
-        renderer.draw(snake, food);
+    protected void paintComponent(Graphics g) {
+    super.paintComponent(g);
+    renderer.draw(snake, food, g); //
     }
 
     protected boolean isGameOver() {

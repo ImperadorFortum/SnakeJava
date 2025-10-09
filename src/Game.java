@@ -19,7 +19,7 @@ public abstract class Game {
     protected abstract void gameOver();
 
     protected void paintComponent(Graphics g) {
-        // TODO Auto-generated method stub
+       
         throw new UnsupportedOperationException("Unimplemented method 'paintComponent'");
     }
 }

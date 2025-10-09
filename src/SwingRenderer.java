@@ -37,60 +37,80 @@ public class SwingRenderer implements Renderer {
         try {
             URL resourceUrl = getClass().getResource("/view/" + fileName);
             if (resourceUrl != null) {
-                System.out.println("Carregando " + fileName + " via getResource: " + resourceUrl);
+                System.out.println("✓ Carregando " + fileName + " via getResource");
                 return ImageIO.read(resourceUrl);
             }
         } catch (Exception e) {
             // Continuar para próxima estratégia
         }
         
-        // Estratégia 2: Caminho relativo à raiz do projeto
+        // Estratégia 2: Buscar a pasta SnakeJava no caminho atual
+        try {
+            String currentDir = System.getProperty("user.dir");
+            File projectRoot = findProjectRoot(new File(currentDir));
+            
+            if (projectRoot != null) {
+                File viewDir = new File(projectRoot, "view");
+                File imageFile = new File(viewDir, fileName);
+                
+                if (imageFile.exists()) {
+                    System.out.println("✓ Carregando " + fileName + " de: " + imageFile.getAbsolutePath());
+                    return ImageIO.read(imageFile);
+                }
+            }
+        } catch (Exception e) {
+            // Continuar para próxima estratégia
+        }
+        
+        // Estratégia 3: Caminho relativo direto
         try {
             File file = new File("view/" + fileName);
             if (file.exists()) {
-                System.out.println("Carregando " + fileName + " via caminho relativo: " + file.getAbsolutePath());
+                System.out.println("✓ Carregando " + fileName + " via caminho relativo");
                 return ImageIO.read(file);
             }
         } catch (Exception e) {
             // Continuar para próxima estratégia
         }
         
-        // Estratégia 3: Subir um nível do diretório atual
+        // Estratégia 4: Subir um nível
         try {
             File file = new File("../view/" + fileName);
             if (file.exists()) {
-                System.out.println("Carregando " + fileName + " via ../ : " + file.getAbsolutePath());
+                System.out.println("✓ Carregando " + fileName + " via ../view/");
                 return ImageIO.read(file);
             }
         } catch (Exception e) {
             // Continuar para próxima estratégia
         }
         
-        // Estratégia 4: Buscar a partir do diretório do código fonte
+        // Estratégia 5: Subir dois níveis (caso esteja em bin ou similar)
         try {
-            // Obter o diretório onde está o arquivo .class
-            String classPath = getClass().getProtectionDomain().getCodeSource().getLocation().getPath();
-            File classDir = new File(classPath).getParentFile();
-            File projectRoot = classDir.getParentFile(); // Subir para raiz do projeto
-            File file = new File(projectRoot, "view/" + fileName);
-            
+            File file = new File("../../view/" + fileName);
             if (file.exists()) {
-                System.out.println("Carregando " + fileName + " via classPath: " + file.getAbsolutePath());
+                System.out.println("✓ Carregando " + fileName + " via ../../view/");
                 return ImageIO.read(file);
             }
         } catch (Exception e) {
             // Continuar para próxima estratégia
         }
         
-        // Estratégia 5: Buscar recursivamente a partir do diretório atual
+        // Estratégia 6: Buscar no diretório do código compilado
         try {
-            File currentDir = new File(System.getProperty("user.dir"));
-            File viewDir = findViewDirectory(currentDir);
-            if (viewDir != null) {
-                File file = new File(viewDir, fileName);
-                if (file.exists()) {
-                    System.out.println("Carregando " + fileName + " via busca recursiva: " + file.getAbsolutePath());
-                    return ImageIO.read(file);
+            String classPath = getClass().getProtectionDomain().getCodeSource().getLocation().getPath();
+            // Decodificar URL encoding (ex: %20 -> espaço)
+            classPath = java.net.URLDecoder.decode(classPath, "UTF-8");
+            
+            File classFile = new File(classPath);
+            File projectRoot = findProjectRoot(classFile);
+            
+            if (projectRoot != null) {
+                File viewDir = new File(projectRoot, "view");
+                File imageFile = new File(viewDir, fileName);
+                
+                if (imageFile.exists()) {
+                    System.out.println("✓ Carregando " + fileName + " via classPath: " + imageFile.getAbsolutePath());
+                    return ImageIO.read(imageFile);
                 }
             }
         } catch (Exception e) {
@@ -99,23 +119,43 @@ public class SwingRenderer implements Renderer {
         
         System.err.println("✗ Não foi possível encontrar: " + fileName);
         System.err.println("  Diretório atual: " + System.getProperty("user.dir"));
+        System.err.println("  DICA: Abra a pasta 'SnakeJava' no VS Code, não a pasta pai!");
         return null;
     }
     
-    private File findViewDirectory(File dir) {
-        // Buscar pasta "view" no diretório atual
-        File viewDir = new File(dir, "view");
-        if (viewDir.exists() && viewDir.isDirectory()) {
-            return viewDir;
-        }
+    /**
+     * Busca recursivamente pela pasta do projeto (que contém a pasta 'view')
+     */
+    private File findProjectRoot(File startDir) {
+        File current = startDir;
         
-        // Buscar no diretório pai
-        File parent = dir.getParentFile();
-        if (parent != null) {
-            viewDir = new File(parent, "view");
-            if (viewDir.exists() && viewDir.isDirectory()) {
-                return viewDir;
+        // Subir até 5 níveis procurando pela pasta 'view'
+        for (int i = 0; i < 5; i++) {
+            if (current == null || !current.exists()) {
+                break;
             }
+            
+            // Verificar se este diretório contém a pasta 'view'
+            File viewDir = new File(current, "view");
+            if (viewDir.exists() && viewDir.isDirectory()) {
+                // Verificar se contém os arquivos esperados
+                File testFile = new File(viewDir, "Corpo.png");
+                if (testFile.exists()) {
+                    return current;
+                }
+            }
+            
+            // Verificar se há uma subpasta 'SnakeJava' aqui
+            File snakeJavaDir = new File(current, "SnakeJava");
+            if (snakeJavaDir.exists() && snakeJavaDir.isDirectory()) {
+                File viewDir2 = new File(snakeJavaDir, "view");
+                if (viewDir2.exists() && viewDir2.isDirectory()) {
+                    return snakeJavaDir;
+                }
+            }
+            
+            // Subir um nível
+            current = current.getParentFile();
         }
         
         return null;

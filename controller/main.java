@@ -21,7 +21,7 @@ public class main {
                     snake.move();
                     panel.repaint();
                     try {
-                        Thread.sleep(120);
+                        Thread.sleep(300);
                     } catch (InterruptedException e) {
                         Thread.currentThread().interrupt();
                     }

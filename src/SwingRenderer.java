@@ -18,6 +18,7 @@ public class SwingRenderer implements Renderer {
         }
     }
 
+    @Override
     public void draw(Snake snake, Food food, Graphics g) {
         // Desenha cada segmento da cobra
         for (Point pos : snake.getBody()) {
@@ -55,9 +56,4 @@ public class SwingRenderer implements Renderer {
             }).start();
         });
     }
-
-    @Override
-public void draw(Snake snake, Food food) {
-    // Método vazio para cumprir a interface Renderer
-}
 }

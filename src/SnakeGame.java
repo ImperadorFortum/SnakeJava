@@ -1,6 +1,6 @@
+import java.awt.Graphics;
 
-
-public class SnakeGame extends Game {
+public abstract class SnakeGame extends Game {
     private Snake snake;
     private Food food;
     private Renderer renderer;
@@ -37,7 +37,7 @@ public class SnakeGame extends Game {
         }
     }
 
-    protected void paintComponent(Graphics g) {
+    public void paintComponent(Graphics g) {
     super.paintComponent(g);
     renderer.draw(snake, food, g); //
     }

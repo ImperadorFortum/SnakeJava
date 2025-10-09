@@ -1,3 +1,5 @@
+import java.awt.Graphics;
+
 public abstract class Game {
     public final void start() {
         setup();
@@ -15,4 +17,9 @@ public abstract class Game {
     protected abstract void render();
     protected abstract boolean isGameOver();
     protected abstract void gameOver();
+
+    protected void paintComponent(Graphics g) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'paintComponent'");
+    }
 }

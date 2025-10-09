@@ -1,7 +1,7 @@
 import javax.swing.SwingUtilities;
 import javax.swing.JFrame;
 
-public class Main {
+public class main {
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
             Renderer renderer = new SwingRenderer();

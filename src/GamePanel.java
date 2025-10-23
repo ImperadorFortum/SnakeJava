@@ -4,15 +4,18 @@ import java.awt.event.ActionEvent;
 
 public class GamePanel extends JPanel {
     private Snake snake;
-    private Food food;
     private Renderer renderer;
+    private SnakeGame game;
 
-    public GamePanel(Snake snake, Food food, Renderer renderer) {
-        this.snake = snake;
-        this.food = food;
+    public GamePanel(SnakeGame game, Renderer renderer) {
+        this.game = game;
         this.renderer = renderer;
         setPreferredSize(new Dimension(400, 400));
         setupKeyBindings();
+    }
+
+    public void setSnake(Snake snake) {
+        this.snake = snake;
     }
     
     private void setupKeyBindings() {
@@ -30,28 +33,36 @@ public class GamePanel extends JPanel {
         actionMap.put("up", new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                snake.setDirection(Direction.UP);
+                if (snake != null) {
+                    snake.setDirection(Direction.UP);
+                }
             }
         });
         
         actionMap.put("down", new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                snake.setDirection(Direction.DOWN);
+                if (snake != null) {
+                    snake.setDirection(Direction.DOWN);
+                }
             }
         });
         
         actionMap.put("left", new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                snake.setDirection(Direction.LEFT);
+                if (snake != null) {
+                    snake.setDirection(Direction.LEFT);
+                }
             }
         });
         
         actionMap.put("right", new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                snake.setDirection(Direction.RIGHT);
+                if (snake != null) {
+                    snake.setDirection(Direction.RIGHT);
+                }
             }
         });
     }
@@ -59,6 +70,9 @@ public class GamePanel extends JPanel {
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-        renderer.draw(snake, food, g);
+        if (game != null && game.getSnake() != null && game.getFood() != null) {
+            renderer.draw(game.getSnake(), game.getFood(), g);
+        }
     }
 }
+

@@ -24,6 +24,14 @@ public class Snake {
         body.add(0, newHead);
     }
 
+    public void shrink(int segments) {
+        for (int i = 0; i < segments; i++) {
+            if (body.size() > 1) { // Garante que a cobra não desapareça completamente
+                body.remove(body.size() - 1);
+            }
+        }
+    }
+
     public Point getHead() {
         return body.get(0);
     }

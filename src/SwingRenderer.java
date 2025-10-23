@@ -1,4 +1,3 @@
-import javax.swing.*;
 import java.awt.*;
 import java.awt.image.*;
 import java.io.*;
@@ -9,6 +8,8 @@ public class SwingRenderer implements Renderer {
     
     private BufferedImage corpoSprite;
     private BufferedImage macaSprite;
+    private BufferedImage goldenMacaSprite;
+    private BufferedImage greenMacaSprite;
     private BufferedImage paredeSprite;
     private BufferedImage fundoSprite;
 
@@ -16,7 +17,9 @@ public class SwingRenderer implements Renderer {
         try {
             // Tentar múltiplas estratégias para encontrar os sprites
             corpoSprite = loadImage("Corpo.png");
-            macaSprite = loadImage("Maçã.png");
+            macaSprite = loadImage("Maçã.png"); // Maçã normal
+            goldenMacaSprite = loadImage("MacaDourada.png"); // Nova maçã dourada
+            greenMacaSprite = loadImage("MacaVerde.png"); // Nova maçã verde
             paredeSprite = loadImage("Parede.png");
             fundoSprite = loadImage("Fundo.png");
             
@@ -204,11 +207,26 @@ public class SwingRenderer implements Renderer {
         
         // Desenha a maçã
         Point foodPos = food.getPosition();
-        if (macaSprite != null) {
-            g.drawImage(macaSprite, foodPos.x * 20, foodPos.y * 20, 20, 20, null);
+        BufferedImage currentFoodSprite = null;
+        if (food instanceof GoldenFood) {
+            currentFoodSprite = goldenMacaSprite;
+        } else if (food instanceof GreenFood) {
+            currentFoodSprite = greenMacaSprite;
+        } else { // Default para NormalFood
+            currentFoodSprite = macaSprite;
+        }
+
+        if (currentFoodSprite != null) {
+            g.drawImage(currentFoodSprite, foodPos.x * 20, foodPos.y * 20, 20, 20, null);
         } else {
-            // Fallback: desenhar círculo vermelho se a imagem não foi carregada
-            g.setColor(Color.RED);
+            // Fallback: desenhar círculo baseado no tipo de maçã se a imagem não foi carregada
+            if (food instanceof GoldenFood) {
+                g.setColor(Color.YELLOW);
+            } else if (food instanceof GreenFood) {
+                g.setColor(Color.GREEN.darker());
+            } else {
+                g.setColor(Color.RED);
+            }
             g.fillOval(foodPos.x * 20, foodPos.y * 20, 20, 20);
         }
         
@@ -226,32 +244,6 @@ public class SwingRenderer implements Renderer {
         }
     }
 
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> {
-            SwingRenderer renderer = new SwingRenderer();
-            Snake snake = new Snake();
-            Food food = new Food();
-            GamePanel panel = new GamePanel(snake, food, renderer);
-
-            JFrame frame = new JFrame("Snake Game");
-            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            frame.add(panel);
-            frame.pack();
-            frame.setVisible(true);
-
-            // Loop simples para atualizar o painel e mover a cobra
-            new Thread(() -> {
-                while (true) {
-                    snake.move();
-                    panel.repaint();
-                    try {
-                        Thread.sleep(120);
-                    } catch (InterruptedException e) {
-                        Thread.currentThread().interrupt();
-                    }
-                }
-            }).start();
-        });
-    }
+    // O método main foi removido desta classe e centralizado em controller/main.java
 }
 

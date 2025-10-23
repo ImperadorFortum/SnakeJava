@@ -1,4 +1,3 @@
-import java.awt.Graphics;
 
 public abstract class Game {
     public final void start() {

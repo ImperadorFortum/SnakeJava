@@ -1,99 +1,73 @@
-import javax.swing.SwingUtilities;
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
-import java.awt.Point;
+import javax.swing.*;
+
 
 public class main {
     private static volatile boolean gameRunning = true;
-    
+
     public static void main(String[] args) {
         startGame();
     }
-    
+
     private static void startGame() {
-        gameRunning = true; // Resetar flag ao iniciar novo jogo
-        
+        gameRunning = true;
         SwingUtilities.invokeLater(() -> {
             Renderer renderer = new SwingRenderer();
-            Snake snake = new Snake();
-            Food food = new Food();
-            GamePanel panel = new GamePanel(snake, food, renderer);
+            SnakeGame game = new SnakeGame(renderer) {
+                @Override
+                protected void handleInput() {
+                    // Lógica de input tratada pelo GamePanel
+                }
+
+                @Override
+                protected void render() {
+                    // Renderização tratada pelo GamePanel.repaint()
+                }
+
+                @Override
+                protected boolean isGameOver() {
+                    return getSnake().checkCollision();
+                }
+
+                @Override
+                protected void gameOver() {
+                    // Lógica de Game Over tratada no loop da thread principal
+                }
+            };
+            game.setup();
+            GamePanel panel = new GamePanel(game, renderer);
+            panel.setSnake(game.getSnake());
 
             JFrame frame = new JFrame("Snake Game");
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            frame.setResizable(false);
             frame.add(panel);
             frame.pack();
-            frame.setLocationRelativeTo(null); // Centralizar janela
+            frame.setLocationRelativeTo(null);
             frame.setVisible(true);
 
-            // Loop do jogo com lógica de colisão e crescimento
+            // Loop principal do jogo em uma thread separada
             new Thread(() -> {
-                // Usar array para permitir modificação dentro da lambda
-                final int[] score = {0};
-                
                 while (gameRunning) {
-                    // Mover a cobra
-                    snake.move();
-                    
-                    // Verificar colisões (parede ou próprio corpo)
-                    if (snake.checkCollision()) {
+                    game.update();
+                    if (game.isGameOver()) {
                         gameRunning = false;
-                        
-                        // Capturar valores finais para uso na lambda
-                        final int finalScore = score[0];
-                        final int snakeSize = snake.getBody().size();
-                        
-                        // Mostrar tela de Game Over
+                        final int finalScore = game.getScore();
+                        final int snakeSize = game.getSnake().getBody().size();
                         SwingUtilities.invokeLater(() -> {
-                            String message = "Game Over!\n\n" +
-                                           "Pontuação: " + finalScore + "\n" +
-                                           "Tamanho da cobra: " + snakeSize;
-                            
-                            int option = JOptionPane.showOptionDialog(
-                                frame,
-                                message,
-                                "Game Over",
-                                JOptionPane.YES_NO_OPTION,
-                                JOptionPane.INFORMATION_MESSAGE,
-                                null,
-                                new String[]{"Jogar Novamente", "Sair"},
-                                "Jogar Novamente"
-                            );
-                            
-                            if (option == JOptionPane.YES_OPTION) {
-                                // Reiniciar o jogo
-                                frame.dispose();
-                                startGame();
+                            int choice = JOptionPane.showConfirmDialog(frame, 
+                                "Game Over! Sua pontuação: " + finalScore + ". Tamanho da cobra: " + snakeSize + "\nQuer jogar novamente?", 
+                                "Fim de Jogo", 
+                                JOptionPane.YES_NO_OPTION);
+                            if (choice == JOptionPane.YES_OPTION) {
+                                frame.dispose(); // Fecha a janela atual
+                                startGame(); // Reinicia o jogo
                             } else {
-                                // Sair do jogo
                                 System.exit(0);
                             }
                         });
-                        
                         break;
                     }
-                    
-                    // Verificar se a cobra comeu a maçã
-                    Point head = snake.getHead();
-                    Point foodPos = food.getPosition();
-                    
-                    if (head.equals(foodPos)) {
-                        // Cobra comeu a maçã
-                        snake.grow();
-                        food.respawn();
-                        score[0] += 10;
-                        System.out.println("Maçã comida! Pontuação: " + score[0] + " | Tamanho: " + snake.getBody().size());
-                    }
-                    
-                    // Atualizar o painel
                     panel.repaint();
-                    
-                    try {
-                        Thread.sleep(150); // Velocidade do jogo
-                    } catch (InterruptedException e) {
-                        Thread.currentThread().interrupt();
-                        break;
-                    }
                 }
             }).start();
         });

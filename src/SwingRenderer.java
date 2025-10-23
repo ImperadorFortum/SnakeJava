@@ -16,7 +16,7 @@ public class SwingRenderer implements Renderer {
     public SwingRenderer() {
         try {
             // Tentar múltiplas estratégias para encontrar os sprites
-            corpoSprite = loadImage("Corpo.png");
+            corpoSprite = loadImage(SkinManager.getSelectedSkin());
             macaSprite = loadImage("Maçã.png"); // Maçã normal
             goldenMacaSprite = loadImage("MacaDourada.png"); // Nova maçã dourada
             greenMacaSprite = loadImage("MacaVerde.png"); // Nova maçã verde

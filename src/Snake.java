@@ -32,15 +32,12 @@ public class Snake {
         }
     }
 
-<<<<<<< HEAD
     public void resetSize() {
         Point currentHead = getHead(); // Mantém a posição da cabeça atual
         body.clear();
         body.add(new Point(currentHead.x, currentHead.y)); // Adiciona apenas a cabeça na posição atual
     }
 
-=======
->>>>>>> 17d71ef8e30d69f281b2293c5bf3db3eaccd58c5
     public Point getHead() {
         return body.get(0);
     }

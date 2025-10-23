@@ -1,5 +1,8 @@
 import javax.swing.*;
+<<<<<<< HEAD
+=======
 
+>>>>>>> 17d71ef8e30d69f281b2293c5bf3db3eaccd58c5
 
 public class main {
     private static volatile boolean gameRunning = true;

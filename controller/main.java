@@ -19,7 +19,7 @@ public class main {
             menuPanel.setLayout(new BoxLayout(menuPanel, BoxLayout.Y_AXIS));
             menuPanel.setBorder(BorderFactory.createEmptyBorder(50, 50, 50, 50));
             
-            JLabel title = new JLabel("Snake Game");
+            JLabel title = new JLabel("SnakeLitter");
             title.setFont(new Font("Arial", Font.BOLD, 36));
             title.setAlignmentX(Component.CENTER_ALIGNMENT);
             

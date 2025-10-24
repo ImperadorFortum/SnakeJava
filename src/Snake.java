@@ -10,6 +10,10 @@ public class Snake {
         body.add(new Point(5, 5)); // posição inicial
         direction = Direction.RIGHT;
     }
+    
+    public Direction getDirection() {
+        return direction;
+    }
 
     public void move() {
         Point head = getHead();

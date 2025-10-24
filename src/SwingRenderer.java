@@ -5,6 +5,12 @@ import javax.imageio.ImageIO;
 import java.net.URL;
 
 public class SwingRenderer implements Renderer {
+
+private BufferedImage cabecaCimaSkinSprite;
+private BufferedImage cabecaBaixoSkinSprite;
+private BufferedImage cabecaEsquerdaSkinSprite;
+private BufferedImage cabecaDireitaSkinSprite;
+
     
     private BufferedImage corpoSprite;
     private BufferedImage macaSprite;
@@ -177,6 +183,20 @@ public class SwingRenderer implements Renderer {
             g.setColor(new Color(34, 139, 34)); // Verde escuro
             g.fillRect(0, 0, 400, 400);
         }
+
+        // ...
+String skinPrefix = SkinManager.getSelectedSkin().replace(".png", ""); 
+
+// Determina se deve usar um prefixo de skin (ex: "Azul") ou nenhum (para "Verde" e "Vermelho")
+String skinPrefixForHead = (skinPrefix.equals("Azul") || skinPrefix.equals("Verde") || skinPrefix.equals("Vermelho")) ? skinPrefix : "";
+
+// Tenta carregar o sprite específico da skin (ex: "Cabeça/Azulcima.png")
+cabecaCimaSkinSprite = loadImage("Cabeça/" + skinPrefixForHead + "cima.png");
+cabecaBaixoSkinSprite = loadImage("Cabeça/" + skinPrefixForHead + "baixo.png");
+cabecaEsquerdaSkinSprite = loadImage("Cabeça/" + skinPrefixForHead + "esquerda.png");
+cabecaDireitaSkinSprite = loadImage("Cabeça/" + skinPrefixForHead + "direita.png");
+
+
         
         // Desenhar paredes ao redor do mapa
         if (paredeSprite != null) {
@@ -230,8 +250,11 @@ public class SwingRenderer implements Renderer {
             g.fillOval(foodPos.x * 20, foodPos.y * 20, 20, 20);
         }
         
-        // Desenha cada segmento da cobra
-        for (Point pos : snake.getBody()) {
+        // Desenha cada segmento da cobra (desenha corpo e depois a cabeça com sprite específico)
+        java.util.List<Point> body = snake.getBody();
+        // Desenhar corpo (todos exceto a cabeça)
+        for (int i = 1; i < body.size(); i++) {
+            Point pos = body.get(i);
             if (corpoSprite != null) {
                 g.drawImage(corpoSprite, pos.x * 20, pos.y * 20, 20, 20, null);
             } else {
@@ -242,8 +265,53 @@ public class SwingRenderer implements Renderer {
                 g.drawRect(pos.x * 20, pos.y * 20, 20, 20);
             }
         }
+
+        // Desenhar cabeça usando sprite específico baseado na direção da cobra
+        if (!body.isEmpty()) {
+            Point head = body.get(0);
+            Direction headDir = Direction.RIGHT; // fallback
+            if (body.size() > 1) {
+                Point neck = body.get(1);
+                if (head.x > neck.x) {
+                    headDir = Direction.RIGHT;
+                } else if (head.x < neck.x) {
+                    headDir = Direction.LEFT;
+                } else if (head.y > neck.y) {
+                    headDir = Direction.DOWN;
+                } else if (head.y < neck.y) {
+                    headDir = Direction.UP;
+                }
+            }
+            BufferedImage headSprite = getHeadSprite(headDir);
+            if (headSprite != null) {
+                g.drawImage(headSprite, head.x * 20, head.y * 20, 20, 20, null);
+            } else if (corpoSprite != null) {
+                g.drawImage(corpoSprite, head.x * 20, head.y * 20, 20, 20, null);
+            } else {
+                g.setColor(Color.GREEN);
+                g.fillRect(head.x * 20, head.y * 20, 20, 20);
+                g.setColor(Color.DARK_GRAY);
+                g.drawRect(head.x * 20, head.y * 20, 20, 20);
+            }
+        }
     }
+    
 
-    // O método main foi removido desta classe e centralizado em controller/main.java
+/**
+ * Retorna o sprite da cabeça da cobra baseado na direção atual.
+ */
+private BufferedImage getHeadSprite(Direction direction) {
+    switch (direction) {
+        case UP:
+            return cabecaCimaSkinSprite;
+        case DOWN:
+            return cabecaBaixoSkinSprite;
+        case LEFT:
+            return cabecaEsquerdaSkinSprite;
+        case RIGHT:
+            return cabecaDireitaSkinSprite;
+        default:
+            return null;
+    }
 }
-
+}

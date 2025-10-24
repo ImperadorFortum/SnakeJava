@@ -1,45 +1,75 @@
-import java.util.*;
 import java.awt.Point;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Snake {
     private List<Point> body;
     private Direction direction;
+    private boolean grow;
 
     public Snake() {
         body = new ArrayList<>();
-        body.add(new Point(5, 5)); // posição inicial
         direction = Direction.RIGHT;
-    }
-    
-    public Direction getDirection() {
-        return direction;
+        grow = false;
+        
+        // Inicia a cobra com 3 segmentos de corpo
+        int startX = 5;
+        int startY = 10;
+        
+        // Cabeça + 2 segmentos de corpo
+        body.add(new Point(startX, startY));        // Cabeça
+        body.add(new Point(startX - 1, startY));    // Primeiro segmento do corpo
+        body.add(new Point(startX - 2, startY));    // Segundo segmento do corpo
     }
 
     public void move() {
         Point head = getHead();
-        Point newHead = new Point(head.x + direction.dx, head.y + direction.dy);
+        Point newHead = new Point(head.x, head.y);
+        
+        switch (direction) {
+            case UP:
+                newHead.y--;
+                break;
+            case DOWN:
+                newHead.y++;
+                break;
+            case LEFT:
+                newHead.x--;
+                break;
+            case RIGHT:
+                newHead.x++;
+                break;
+        }
+        
         body.add(0, newHead);
-        body.remove(body.size() - 1);
-    }
-
-    public void grow() {
-        Point head = getHead();
-        Point newHead = new Point(head.x + direction.dx, head.y + direction.dy);
-        body.add(0, newHead);
-    }
-
-    public void shrink(int segments) {
-        for (int i = 0; i < segments; i++) {
-            if (body.size() > 1) { // Garante que a cobra não desapareça completamente
-                body.remove(body.size() - 1);
-            }
+        
+        if (!grow) {
+            body.remove(body.size() - 1);
+        } else {
+            grow = false;
         }
     }
 
-    public void resetSize() {
-        Point currentHead = getHead(); // Mantém a posição da cabeça atual
-        body.clear();
-        body.add(new Point(currentHead.x, currentHead.y)); // Adiciona apenas a cabeça na posição atual
+    public void grow() {
+        this.grow = true;
+    }
+
+    public boolean checkCollision() {
+        Point head = getHead();
+        
+        // Verifica colisão com as paredes
+        if (head.x <= 0 || head.x >= 19 || head.y <= 0 || head.y >= 19) {
+            return true;
+        }
+        
+        // Verifica colisão com o próprio corpo (ignora a cabeça)
+        for (int i = 1; i < body.size(); i++) {
+            if (head.equals(body.get(i))) {
+                return true;
+            }
+        }
+        
+        return false;
     }
 
     public Point getHead() {
@@ -50,37 +80,17 @@ public class Snake {
         return body;
     }
 
-    public void setDirection(Direction newDirection) {
-        if ((direction == Direction.RIGHT && newDirection != Direction.LEFT) ||
-            (direction == Direction.LEFT && newDirection != Direction.RIGHT) ||
-            (direction == Direction.UP && newDirection != Direction.DOWN) ||
-            (direction == Direction.DOWN && newDirection != Direction.UP)) {
-            this.direction = newDirection;
+    public Direction getDirection() {
+        return direction;
+    }
+
+    public void setDirection(Direction direction) {
+        // Impede movimento inverso
+        if ((this.direction == Direction.UP && direction != Direction.DOWN) ||
+            (this.direction == Direction.DOWN && direction != Direction.UP) ||
+            (this.direction == Direction.LEFT && direction != Direction.RIGHT) ||
+            (this.direction == Direction.RIGHT && direction != Direction.LEFT)) {
+            this.direction = direction;
         }
-    }
-    
-    // Verifica se a cobra colidiu com ela mesma
-    public boolean checkSelfCollision() {
-        Point head = getHead();
-        // Verifica se a cabeça está na mesma posição de algum segmento do corpo
-        for (int i = 1; i < body.size(); i++) {
-            if (head.equals(body.get(i))) {
-                return true;
-            }
-        }
-        return false;
-    }
-    
-    // Verifica se a cobra colidiu com as paredes
-    public boolean checkWallCollision() {
-        Point head = getHead();
-        // As paredes estão nas bordas: x=0, x=19, y=0, y=19
-        return head.x <= 0 || head.x >= 19 || head.y <= 0 || head.y >= 19;
-    }
-    
-    // Verifica qualquer tipo de colisão (parede ou próprio corpo)
-    public boolean checkCollision() {
-        return checkWallCollision() || checkSelfCollision();
     }
 }
-

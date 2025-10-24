@@ -11,6 +11,7 @@ public class main {
 
     public static void main(String[] args) {
         loadSounds();
+        playBackgroundMusic(); // Música começa assim que o jogo abre
         showMenu();
     }
 
@@ -129,39 +130,40 @@ public class main {
             JPanel skinsPanel = new JPanel();
             skinsPanel.setLayout(new BoxLayout(skinsPanel, BoxLayout.Y_AXIS));
             skinsPanel.setBorder(BorderFactory.createEmptyBorder(30, 50, 30, 50));
-            skinsPanel.setBackground(new Color(34, 139, 34));
+            skinsPanel.setBackground(new Color(40, 180, 40));
             
             JLabel title = new JLabel("ESCOLHA SUA SKIN");
-            title.setFont(new Font("Arial", Font.BOLD, 16));
-            title.setForeground(Color.WHITE);
+            title.setFont(new Font("Comic Sans MS", Font.BOLD, 20));
+            title.setForeground(Color.YELLOW);
             title.setAlignmentX(Component.CENTER_ALIGNMENT);
             skinsPanel.add(title);
             skinsPanel.add(Box.createRigidArea(new Dimension(0, 30)));
             
             String[] skins = {"Azul", "Vermelho", "Verde"};
-            Color[] colors = {Color.BLUE, Color.RED, Color.GREEN};
+            Color[] colors = {new Color(0, 100, 255), new Color(255, 50, 50), new Color(50, 200, 50)};
             
             ButtonGroup skinGroup = new ButtonGroup();
             
             for (int i = 0; i < skins.length; i++) {
                 JPanel skinPanel = new JPanel();
-                skinPanel.setBackground(new Color(34, 139, 34));
+                skinPanel.setBackground(new Color(40, 180, 40));
                 skinPanel.setLayout(new FlowLayout());
                 
                 JRadioButton radioButton = new JRadioButton(skins[i]);
-                radioButton.setFont(new Font("Arial", Font.BOLD, 14));
+                radioButton.setFont(new Font("Comic Sans MS", Font.BOLD, 16));
                 radioButton.setForeground(Color.WHITE);
-                radioButton.setBackground(new Color(34, 139, 34));
+                radioButton.setBackground(new Color(40, 180, 40));
                 
                 JLabel colorLabel = new JLabel("■");
-                colorLabel.setFont(new Font("Arial", Font.BOLD, 20));
+                colorLabel.setFont(new Font("Arial", Font.BOLD, 24));
                 colorLabel.setForeground(colors[i]);
                 
                 skinGroup.add(radioButton);
                 skinPanel.add(colorLabel);
+                skinPanel.add(Box.createRigidArea(new Dimension(10, 0)));
                 skinPanel.add(radioButton);
                 skinsPanel.add(skinPanel);
-                skinsPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+                skinsPanel.add(Box.createRigidArea(new Dimension(0, 15)));
                 
                 if (skins[i].equalsIgnoreCase(SkinManager.getSelectedSkin().replace(".png", ""))) {
                     radioButton.setSelected(true);
@@ -174,14 +176,15 @@ public class main {
                 });
             }
             
-            JButton backButton = new JButton("VOLTAR");
-            backButton.setFont(new Font("Arial", Font.BOLD, 12));
+            JButton backButton = new JButton("VOLTAR AO MENU");
+            backButton.setFont(new Font("Comic Sans MS", Font.BOLD, 16));
             backButton.setForeground(Color.WHITE);
-            backButton.setBackground(new Color(139, 0, 0));
+            backButton.setBackground(new Color(255, 50, 50));
             backButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-            backButton.setMaximumSize(new Dimension(200, 40));
+            backButton.setMaximumSize(new Dimension(280, 65));
             backButton.setFocusPainted(false);
-            skinsPanel.add(Box.createRigidArea(new Dimension(0, 20)));
+            backButton.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
+            skinsPanel.add(Box.createRigidArea(new Dimension(0, 25)));
             skinsPanel.add(backButton);
             
             backButton.addActionListener(evt -> {
@@ -231,8 +234,6 @@ public class main {
             frame.setLocationRelativeTo(null);
             frame.setVisible(true);
 
-            playBackgroundMusic();
-
             new Thread(() -> {
                 while (gameRunning) {
                     game.update();
@@ -241,7 +242,6 @@ public class main {
                         final int finalScore = game.getScore();
                         final int snakeSize = game.getSnake().getBody().size();
                         SwingUtilities.invokeLater(() -> {
-                            stopBackgroundMusic();
                             int choice = JOptionPane.showConfirmDialog(frame, 
                                 "GAME OVER!\nPontuação: " + finalScore + "\nTamanho: " + snakeSize + "\n\nJogar Novamente?", 
                                 "Fim de Jogo", 
@@ -250,6 +250,7 @@ public class main {
                                 frame.dispose();
                                 runGameLoop();
                             } else {
+                                frame.dispose();
                                 showMenu();
                             }
                         });
@@ -269,19 +270,24 @@ public class main {
 
 class MenuPanel extends JPanel {
     public MenuPanel() {
-        setPreferredSize(new Dimension(600, 500));
-        setBackground(new Color(34, 139, 34));
+        setPreferredSize(new Dimension(800, 650));
+        setBackground(new Color(40, 180, 40));
         setLayout(new BorderLayout());
         
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.Y_AXIS));
         buttonPanel.setOpaque(false);
-        buttonPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 50, 0));
+        buttonPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 80, 0));
         
         JLabel title = new JLabel("SNAKEDASH");
-        title.setFont(new Font("Arial", Font.BOLD, 36));
-        title.setForeground(Color.YELLOW);
+        title.setFont(new Font("Comic Sans MS", Font.BOLD, 58));
+        title.setForeground(new Color(255, 255, 0));
         title.setAlignmentX(Component.CENTER_ALIGNMENT);
+        
+        JLabel subtitle = new JLabel("Jogo da Cobrinha");
+        subtitle.setFont(new Font("Comic Sans MS", Font.ITALIC, 22));
+        subtitle.setForeground(new Color(255, 255, 200));
+        subtitle.setAlignmentX(Component.CENTER_ALIGNMENT);
         
         JButton startButton = createMenuButton("INICIAR JOGO");
         JButton skinsButton = createMenuButton("PERSONALIZAR");
@@ -305,36 +311,52 @@ class MenuPanel extends JPanel {
         
         buttonPanel.add(Box.createVerticalGlue());
         buttonPanel.add(title);
-        buttonPanel.add(Box.createRigidArea(new Dimension(0, 50)));
+        buttonPanel.add(Box.createRigidArea(new Dimension(0, 5)));
+        buttonPanel.add(subtitle);
+        buttonPanel.add(Box.createRigidArea(new Dimension(0, 60)));
         buttonPanel.add(startButton);
-        buttonPanel.add(Box.createRigidArea(new Dimension(0, 20)));
+        buttonPanel.add(Box.createRigidArea(new Dimension(0, 25)));
         buttonPanel.add(skinsButton);
-        buttonPanel.add(Box.createRigidArea(new Dimension(0, 20)));
+        buttonPanel.add(Box.createRigidArea(new Dimension(0, 25)));
         buttonPanel.add(exitButton);
         buttonPanel.add(Box.createVerticalGlue());
         
         add(buttonPanel, BorderLayout.CENTER);
+        
+        JLabel credits = new JLabel("Desenvolvido Por Joedson Nascimento e Felipe Dantas", JLabel.CENTER);
+        credits.setFont(new Font("Comic Sans MS", Font.PLAIN, 12));
+        credits.setForeground(new Color(200, 255, 200));
+        credits.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 0));
+        add(credits, BorderLayout.SOUTH);
     }
     
     private JButton createMenuButton(String text) {
         JButton button = new JButton(text);
-        button.setFont(new Font("Arial", Font.BOLD, 14));
+        button.setFont(new Font("Comic Sans MS", Font.BOLD, 22));
         button.setForeground(Color.WHITE);
-        button.setBackground(new Color(139, 0, 0));
+        button.setBackground(new Color(255, 50, 50));
         button.setAlignmentX(Component.CENTER_ALIGNMENT);
-        button.setMaximumSize(new Dimension(250, 50));
+        button.setMaximumSize(new Dimension(350, 70));
         button.setFocusPainted(false);
-        button.setBorder(BorderFactory.createRaisedBevelBorder());
+        button.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
         
         button.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseEntered(java.awt.event.MouseEvent evt) {
-                button.setBackground(new Color(178, 34, 34));
+                button.setBackground(new Color(255, 100, 100));
+                button.setForeground(new Color(255, 255, 0));
             }
             public void mouseExited(java.awt.event.MouseEvent evt) {
-                button.setBackground(new Color(139, 0, 0));
+                button.setBackground(new Color(255, 50, 50));
+                button.setForeground(Color.WHITE);
             }
         });
         
         return button;
+    }
+    
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        // Fundo limpo sem bolas
     }
 }

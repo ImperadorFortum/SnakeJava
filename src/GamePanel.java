@@ -6,11 +6,14 @@ public class GamePanel extends JPanel {
     private Snake snake;
     private Renderer renderer;
     private SnakeGame game;
+    private static final int GRID_SIZE = 25;
+    private static final int TILE_SIZE = 25;
 
     public GamePanel(SnakeGame game, Renderer renderer) {
         this.game = game;
         this.renderer = renderer;
-        setPreferredSize(new Dimension(400, 400));
+        setPreferredSize(new Dimension(GRID_SIZE * TILE_SIZE, GRID_SIZE * TILE_SIZE));
+        setBackground(Color.BLACK);
         setupKeyBindings();
     }
 
@@ -19,21 +22,22 @@ public class GamePanel extends JPanel {
     }
     
     private void setupKeyBindings() {
-        // KeyBindings funcionam mesmo quando o componente não tem foco
         InputMap inputMap = getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
         ActionMap actionMap = getActionMap();
         
-        // Mapear teclas
         inputMap.put(KeyStroke.getKeyStroke("UP"), "up");
         inputMap.put(KeyStroke.getKeyStroke("DOWN"), "down");
         inputMap.put(KeyStroke.getKeyStroke("LEFT"), "left");
         inputMap.put(KeyStroke.getKeyStroke("RIGHT"), "right");
+        inputMap.put(KeyStroke.getKeyStroke("W"), "up");
+        inputMap.put(KeyStroke.getKeyStroke("S"), "down");
+        inputMap.put(KeyStroke.getKeyStroke("A"), "left");
+        inputMap.put(KeyStroke.getKeyStroke("D"), "right");
         
-        // Definir ações
         actionMap.put("up", new AbstractAction() {
             @Override
-            public void actionPerformed(ActionEvent e) {
-                if (snake != null) {
+            public void actionPerformed(ActionEvent evt) {
+                if (snake != null && snake.getDirection() != Direction.DOWN) {
                     snake.setDirection(Direction.UP);
                 }
             }
@@ -41,8 +45,8 @@ public class GamePanel extends JPanel {
         
         actionMap.put("down", new AbstractAction() {
             @Override
-            public void actionPerformed(ActionEvent e) {
-                if (snake != null) {
+            public void actionPerformed(ActionEvent evt) {
+                if (snake != null && snake.getDirection() != Direction.UP) {
                     snake.setDirection(Direction.DOWN);
                 }
             }
@@ -50,8 +54,8 @@ public class GamePanel extends JPanel {
         
         actionMap.put("left", new AbstractAction() {
             @Override
-            public void actionPerformed(ActionEvent e) {
-                if (snake != null) {
+            public void actionPerformed(ActionEvent evt) {
+                if (snake != null && snake.getDirection() != Direction.RIGHT) {
                     snake.setDirection(Direction.LEFT);
                 }
             }
@@ -59,8 +63,8 @@ public class GamePanel extends JPanel {
         
         actionMap.put("right", new AbstractAction() {
             @Override
-            public void actionPerformed(ActionEvent e) {
-                if (snake != null) {
+            public void actionPerformed(ActionEvent evt) {
+                if (snake != null && snake.getDirection() != Direction.LEFT) {
                     snake.setDirection(Direction.RIGHT);
                 }
             }

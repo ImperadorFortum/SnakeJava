@@ -1,12 +1,75 @@
 import javax.swing.*;
 import java.awt.*;
-
+import javax.sound.sampled.*;
+import java.io.File;
 
 public class main {
     private static volatile boolean gameRunning = true;
+    private static Clip backgroundMusic;
+    private static Clip eatingSound;
+    private static Clip gameStartSound;
 
     public static void main(String[] args) {
+        loadSounds();
         showMenu();
+    }
+
+    private static void loadSounds() {
+        try {
+            AudioInputStream audioStream = AudioSystem.getAudioInputStream(new File("MUSICA_DE_FUNDO.waw"));
+            backgroundMusic = AudioSystem.getClip();
+            backgroundMusic.open(audioStream);
+            
+            audioStream = AudioSystem.getAudioInputStream(new File("SOM-MAÇA.waw"));
+            eatingSound = AudioSystem.getClip();
+            eatingSound.open(audioStream);
+            
+            audioStream = AudioSystem.getAudioInputStream(new File("INICIO_DE_JOGO.waw"));
+            gameStartSound = AudioSystem.getClip();
+            gameStartSound.open(audioStream);
+            
+        } catch (Exception e) {
+            System.err.println("Erro ao carregar arquivos de áudio: " + e.getMessage());
+        }
+    }
+
+    public static void playBackgroundMusic() {
+        if (backgroundMusic != null) {
+            try {
+                backgroundMusic.loop(Clip.LOOP_CONTINUOUSLY);
+                backgroundMusic.start();
+            } catch (Exception e) {
+                System.err.println("Erro ao tocar música de fundo: " + e.getMessage());
+            }
+        }
+    }
+
+    public static void stopBackgroundMusic() {
+        if (backgroundMusic != null && backgroundMusic.isRunning()) {
+            backgroundMusic.stop();
+        }
+    }
+
+    public static void playEatingSound() {
+        if (eatingSound != null) {
+            try {
+                eatingSound.setFramePosition(0);
+                eatingSound.start();
+            } catch (Exception e) {
+                System.err.println("Erro ao tocar som da maçã: " + e.getMessage());
+            }
+        }
+    }
+
+    public static void playGameStartSound() {
+        if (gameStartSound != null) {
+            try {
+                gameStartSound.setFramePosition(0);
+                gameStartSound.start();
+            } catch (Exception e) {
+                System.err.println("Erro ao tocar som de início: " + e.getMessage());
+            }
+        }
     }
 
     private static void showMenu() {
@@ -48,6 +111,7 @@ public class main {
             
             startButton.addActionListener(e -> {
                 menuFrame.dispose();
+                playGameStartSound();
                 runGameLoop();
             });
             
@@ -56,6 +120,7 @@ public class main {
             });
             
             exitButton.addActionListener(e -> {
+                stopBackgroundMusic();
                 System.exit(0);
             });
             
@@ -82,7 +147,6 @@ public class main {
             skinsPanel.add(title);
             skinsPanel.add(Box.createRigidArea(new Dimension(0, 20)));
             
-            // Lista de skins disponíveis (o usuário pode substituir as imagens)
             String[] skins = {"Azul.png", "Vermelho.png", "Verde.png"};
             
             ButtonGroup skinGroup = new ButtonGroup();
@@ -95,7 +159,6 @@ public class main {
                 skinsPanel.add(radioButton);
                 skinsPanel.add(Box.createRigidArea(new Dimension(0, 5)));
                 
-                // Pré-selecionar a skin atual
                 if (skin.startsWith(SkinManager.getSelectedSkin())) {
                     radioButton.setSelected(true);
                 }
@@ -116,14 +179,14 @@ public class main {
             
             backButton.addActionListener(e -> {
                 skinsFrame.dispose();
-                parentFrame.setVisible(true); // Reabre o menu principal
+                parentFrame.setVisible(true);
             });
             
             skinsFrame.add(skinsPanel);
             skinsFrame.pack();
             skinsFrame.setLocationRelativeTo(parentFrame);
             skinsFrame.setVisible(true);
-            parentFrame.setVisible(false); // Esconde o menu principal
+            parentFrame.setVisible(false);
         });
     }
 
@@ -134,12 +197,10 @@ public class main {
             SnakeGame game = new SnakeGame(renderer) {
                 @Override
                 protected void handleInput() {
-                    // Lógica de input tratada pelo GamePanel
                 }
 
                 @Override
                 protected void render() {
-                    // Renderização tratada pelo GamePanel.repaint()
                 }
 
                 @Override
@@ -149,7 +210,6 @@ public class main {
 
                 @Override
                 protected void gameOver() {
-                    // Lógica de Game Over tratada no loop da thread principal
                 }
             };
             game.setup();
@@ -164,7 +224,8 @@ public class main {
             frame.setLocationRelativeTo(null);
             frame.setVisible(true);
 
-            // Loop principal do jogo em uma thread separada
+            playBackgroundMusic();
+
             new Thread(() -> {
                 while (gameRunning) {
                     game.update();
@@ -173,13 +234,14 @@ public class main {
                         final int finalScore = game.getScore();
                         final int snakeSize = game.getSnake().getBody().size();
                         SwingUtilities.invokeLater(() -> {
+                            stopBackgroundMusic();
                             int choice = JOptionPane.showConfirmDialog(frame, 
                                 "Game Over! Sua pontuação: " + finalScore + ". Tamanho da cobra: " + snakeSize + "\nQuer jogar novamente?", 
                                 "Fim de Jogo", 
                                 JOptionPane.YES_NO_OPTION);
                             if (choice == JOptionPane.YES_OPTION) {
-                                frame.dispose(); // Fecha a janela atual
-                                runGameLoop(); // Reinicia o jogo
+                                frame.dispose();
+                                runGameLoop();
                             } else {
                                 System.exit(0);
                             }
@@ -192,4 +254,3 @@ public class main {
         });
     }
 }
-

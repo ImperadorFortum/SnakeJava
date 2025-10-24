@@ -9,13 +9,13 @@ public abstract class SnakeGame extends Game {
     private Renderer renderer;
     private boolean running = true;
     private int updateInterval;
-    private int normalUpdateInterval; // Para armazenar o intervalo normal
+    private int normalUpdateInterval;
     private Random random = new Random();
     private int score = 0;
 
     public SnakeGame(Renderer renderer) {
         this.renderer = renderer;
-        this.normalUpdateInterval = 120; // valor padrão, se desejar
+        this.normalUpdateInterval = 120;
         this.updateInterval = normalUpdateInterval;
     }
     
@@ -31,35 +31,34 @@ public abstract class SnakeGame extends Game {
     }
 
     private void spawnFood() {
-        int foodType = random.nextInt(100); // 0-99
-        if (foodType < 70) { // 70% de chance de Maçã Normal
+        int foodType = random.nextInt(100);
+        if (foodType < 70) {
             food = new NormalFood();
-        } else if (foodType < 90) { // 20% de chance de Maçã Dourada
+        } else if (foodType < 90) {
             food = new GoldenFood();
-        } else { // 10% de chance de Maçã Verde
+        } else {
             food = new GreenFood();
         }
     }
 
     protected void handleInput() { 
-        // Lógica para capturar e processar entrada do usuário
     }
 
     protected void update() {
         try {
-            Thread.sleep(updateInterval); // controla o tempo de atualização
+            Thread.sleep(updateInterval);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
         snake.move();
         if (snake.getHead().equals(food.getPosition())) {
+            main.playEatingSound();
             food.applyEffect(snake, this);
             spawnFood();
         }
     }
 
     public void paintComponent(Graphics g) {
-        // Renderizar o jogo
         renderer.draw(snake, food, g);
     }
 
@@ -72,7 +71,7 @@ public abstract class SnakeGame extends Game {
     }
 
     public void activateSpeedBoost(long durationMillis) {
-        this.updateInterval = normalUpdateInterval / 2; // Dobra a velocidade
+        this.updateInterval = normalUpdateInterval / 2;
         Timer timer = new Timer();
         timer.schedule(new TimerTask() {
             @Override
@@ -102,4 +101,3 @@ public abstract class SnakeGame extends Game {
         this.score += points;
     }
 }
-

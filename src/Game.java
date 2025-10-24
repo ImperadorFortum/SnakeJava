@@ -1,5 +1,3 @@
-
-
 public abstract class Game {
     public final void start() {
         setup();
@@ -18,4 +16,3 @@ public abstract class Game {
     protected abstract boolean isGameOver();
     protected abstract void gameOver();
 }
-

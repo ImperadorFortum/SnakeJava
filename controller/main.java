@@ -28,7 +28,7 @@ public class main {
             startButton.setAlignmentX(Component.CENTER_ALIGNMENT);
             startButton.setMaximumSize(new Dimension(200, 50));
             
-            JButton skinsButton = new JButton("Personalizar Cobra");
+            JButton skinsButton = new JButton("Personalizar");
             skinsButton.setFont(new Font("Arial", Font.PLAIN, 20));
             skinsButton.setAlignmentX(Component.CENTER_ALIGNMENT);
             skinsButton.setMaximumSize(new Dimension(200, 50));
@@ -68,7 +68,7 @@ public class main {
 
     private static void showSkinsMenu(JFrame parentFrame) {
         SwingUtilities.invokeLater(() -> {
-            JFrame skinsFrame = new JFrame("Snake Game - Personalizar Cobra");
+            JFrame skinsFrame = new JFrame("Snake Game - Personalizar ");
             skinsFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
             skinsFrame.setResizable(false);
             
@@ -83,7 +83,7 @@ public class main {
             skinsPanel.add(Box.createRigidArea(new Dimension(0, 20)));
             
             // Lista de skins disponíveis (o usuário pode substituir as imagens)
-            String[] skins = {"Corpo.png (Padrão)", "Azul.png", "Vermelho.png", "Verde.png"};
+            String[] skins = {"Azul", "Vermelho", "Verde"};
             
             ButtonGroup skinGroup = new ButtonGroup();
             

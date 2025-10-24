@@ -3,6 +3,13 @@
     "configurations": [
         {
             "type": "java",
+            "name": "main",
+            "request": "launch",
+            "mainClass": "main",
+            "projectName": "SnakeJava_e33c7ed7"
+        },
+        {
+            "type": "java",
             "name": "Launch Snake Game",
             "request": "launch",
             "mainClass": "main",

@@ -142,7 +142,7 @@ public class SwingRenderer implements Renderer {
             File viewDir = new File(current, "view");
             if (viewDir.exists() && viewDir.isDirectory()) {
                 // Verificar se contém os arquivos esperados
-                File testFile = new File(viewDir, "Corpo.png");
+                File testFile = new File(viewDir, "Verde.png");
                 if (testFile.exists()) {
                     return current;
                 }

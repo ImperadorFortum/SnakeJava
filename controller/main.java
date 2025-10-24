@@ -83,7 +83,7 @@ public class main {
             skinsPanel.add(Box.createRigidArea(new Dimension(0, 20)));
             
             // Lista de skins disponíveis (o usuário pode substituir as imagens)
-            String[] skins = {"Azul", "Vermelho", "Verde"};
+            String[] skins = {"Azul.png", "Vermelho.png", "Verde.png"};
             
             ButtonGroup skinGroup = new ButtonGroup();
             

@@ -6,14 +6,12 @@ public class GamePanel extends JPanel {
     private Snake snake;
     private Renderer renderer;
     private SnakeGame game;
-    private static final int GRID_SIZE = 25;
-    private static final int TILE_SIZE = 25;
 
     public GamePanel(SnakeGame game, Renderer renderer) {
         this.game = game;
         this.renderer = renderer;
-        setPreferredSize(new Dimension(GRID_SIZE * TILE_SIZE, GRID_SIZE * TILE_SIZE));
-        setBackground(Color.BLACK);
+        setPreferredSize(new Dimension(400, 400));
+        setBackground(new Color(34, 139, 34)); // Mudei para verde
         setupKeyBindings();
     }
 

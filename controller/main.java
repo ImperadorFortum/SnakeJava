@@ -17,7 +17,7 @@ public class main {
     private static void loadSounds() {
         try {
             File backgroundFile = new File("view\\musica.waw\\MUSICA_DE_FUNDO.wav");
-            File eatingFile = new File("view\\musica.waw\\MUSICA_DE_FUNDO.wav");
+            File eatingFile = new File("view\\musica.waw\\SOM-MAÇA.wav");
             File startFile = new File("view\\musica.waw\\INICIO_DE_JOGO.wav");
             
             System.out.println("Carregando arquivos de áudio...");

@@ -55,14 +55,37 @@ public class Snake {
     }
 
     public void resetSize() {
-        // Mantém apenas a cabeça e adiciona 2 segmentos pequenos do corpo
+        // Mantém apenas a cabeça e adiciona 2 segmentos do corpo POSICIONADOS
+        // ATRÁS da cabeça de acordo com a direção atual. Antes sempre
+        // adicionávamos para a esquerda, o que fazia o renderizador
+        // inferir que a cobra estava apontando para a direita.
         Point currentHead = getHead();
+        Direction dir = this.direction;
         body.clear();
-        
-        // Cabeça + 2 segmentos pequenos do corpo
-        body.add(new Point(currentHead.x, currentHead.y));        // Cabeça (mesma posição)
-        body.add(new Point(currentHead.x - 1, currentHead.y));    // Primeiro segmento do corpo
-        body.add(new Point(currentHead.x - 2, currentHead.y));    // Segundo segmento do corpo
+
+        // Cabeça (mesma posição)
+        body.add(new Point(currentHead.x, currentHead.y));
+
+        // Coloca os dois segmentos atrás da cabeça dependendo da direção
+        switch (dir) {
+            case UP:
+                body.add(new Point(currentHead.x, currentHead.y + 1));
+                body.add(new Point(currentHead.x, currentHead.y + 2));
+                break;
+            case DOWN:
+                body.add(new Point(currentHead.x, currentHead.y - 1));
+                body.add(new Point(currentHead.x, currentHead.y - 2));
+                break;
+            case LEFT:
+                body.add(new Point(currentHead.x + 1, currentHead.y));
+                body.add(new Point(currentHead.x + 2, currentHead.y));
+                break;
+            case RIGHT:
+            default:
+                body.add(new Point(currentHead.x - 1, currentHead.y));
+                body.add(new Point(currentHead.x - 2, currentHead.y));
+                break;
+        }
     }
 
     public boolean checkCollision() {

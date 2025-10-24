@@ -54,6 +54,17 @@ public class Snake {
         this.grow = true;
     }
 
+    public void resetSize() {
+        // Mantém apenas a cabeça e adiciona 2 segmentos pequenos do corpo
+        Point currentHead = getHead();
+        body.clear();
+        
+        // Cabeça + 2 segmentos pequenos do corpo
+        body.add(new Point(currentHead.x, currentHead.y));        // Cabeça (mesma posição)
+        body.add(new Point(currentHead.x - 1, currentHead.y));    // Primeiro segmento do corpo
+        body.add(new Point(currentHead.x - 2, currentHead.y));    // Segundo segmento do corpo
+    }
+
     public boolean checkCollision() {
         Point head = getHead();
         

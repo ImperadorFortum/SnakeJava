@@ -1,20 +1,70 @@
 import javax.swing.*;
 import java.awt.*;
 import javax.sound.sampled.*;
-import java.io.File;
+import java.io.*;
+import java.util.*;
 
 public class main {
     private static volatile boolean gameRunning = true;
     private static Clip backgroundMusic;
     private static Clip eatingSound;
     private static Clip gameStartSound;
+    private static final String HIGH_SCORES_FILE = "highscores.dat";
+    private static ArrayList<Integer> highScores = new ArrayList<>();
 
     public static void main(String[] args) {
+        loadHighScores();
         loadSounds();
-        playBackgroundMusic(); // Música começa assim que o jogo abre
+        playBackgroundMusic();
         showMenu();
     }
 
+    private static void loadHighScores() {
+        try {
+            File file = new File(HIGH_SCORES_FILE);
+            if (file.exists()) {
+                ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file));
+                highScores = (ArrayList<Integer>) ois.readObject();
+                ois.close();
+                System.out.println("Recordes carregados: " + highScores);
+            } else {
+                highScores = new ArrayList<>(Arrays.asList(0, 0, 0, 0, 0));
+                System.out.println("Recordes zerados criados");
+            }
+        } catch (Exception e) {
+            System.err.println("Erro ao carregar recordes: " + e.getMessage());
+            highScores = new ArrayList<>(Arrays.asList(0, 0, 0, 0, 0));
+        }
+    }
+
+    private static void saveHighScores() {
+        try {
+            ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(HIGH_SCORES_FILE));
+            oos.writeObject(highScores);
+            oos.close();
+            System.out.println("Recordes salvos: " + highScores);
+        } catch (Exception e) {
+            System.err.println("Erro ao salvar recordes: " + e.getMessage());
+        }
+    }
+
+    public static void addHighScore(int score) {
+        if (score > 0 && (highScores.isEmpty() || score > Collections.min(highScores))) {
+            highScores.add(score);
+            Collections.sort(highScores, Collections.reverseOrder());
+            if (highScores.size() > 5) {
+                highScores = new ArrayList<>(highScores.subList(0, 5));
+            }
+            saveHighScores();
+            System.out.println("Novo recorde adicionado: " + score);
+        } else {
+            System.out.println("Score " + score + " não é alto o suficiente para recorde");
+        }
+    }
+
+    public static ArrayList<Integer> getHighScores() {
+        return highScores;
+    }
     private static void loadSounds() {
         try {
             File backgroundFile = new File("view\\musica.waw\\MUSICA_DE_FUNDO.wav");
@@ -118,6 +168,67 @@ public class main {
             menuFrame.pack();
             menuFrame.setLocationRelativeTo(null);
             menuFrame.setVisible(true);
+        });
+    }
+
+    public static void showHighScores() {
+        SwingUtilities.invokeLater(() -> {
+            JFrame scoresFrame = new JFrame("Recordes");
+            scoresFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+            scoresFrame.setResizable(false);
+            
+            JPanel scoresPanel = new JPanel();
+            scoresPanel.setLayout(new BoxLayout(scoresPanel, BoxLayout.Y_AXIS));
+            scoresPanel.setBorder(BorderFactory.createEmptyBorder(20, 30, 20, 30));
+            scoresPanel.setBackground(new Color(40, 180, 40));
+            
+            JLabel title = new JLabel(" TOP 5 RECORDES ");
+            title.setFont(new Font("Comic Sans MS", Font.BOLD, 24));
+            title.setForeground(Color.YELLOW);
+            title.setAlignmentX(Component.CENTER_ALIGNMENT);
+            scoresPanel.add(title);
+            scoresPanel.add(Box.createRigidArea(new Dimension(0, 20)));
+            
+            ArrayList<Integer> scores = getHighScores();
+            for (int i = 0; i < 5; i++) {
+                JPanel scorePanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+                scorePanel.setBackground(new Color(40, 180, 40));
+                
+                JLabel position = new JLabel((i + 1) + "º: ");
+                position.setFont(new Font("Comic Sans MS", Font.BOLD, 18));
+                position.setForeground(Color.WHITE);
+                
+                int scoreValue = i < scores.size() ? scores.get(i) : 0;
+                JLabel scoreLabel = new JLabel(scoreValue == 0 ? "-" : String.valueOf(scoreValue));
+                scoreLabel.setFont(new Font("Comic Sans MS", Font.BOLD, 18));
+                scoreLabel.setForeground(scoreValue == 0 ? Color.LIGHT_GRAY : new Color(255, 215, 0));
+                scoreLabel.setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 0));
+                
+                scorePanel.add(position);
+                scorePanel.add(scoreLabel);
+                scoresPanel.add(scorePanel);
+                scoresPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+            }
+            
+            JButton closeButton = new JButton("FECHAR");
+            closeButton.setFont(new Font("Comic Sans MS", Font.BOLD, 16));
+            closeButton.setForeground(Color.WHITE);
+            closeButton.setBackground(new Color(255, 50, 50));
+            closeButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+            closeButton.setMaximumSize(new Dimension(200, 45));
+            closeButton.setFocusPainted(false);
+            closeButton.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
+            scoresPanel.add(Box.createRigidArea(new Dimension(0, 20)));
+            scoresPanel.add(closeButton);
+            
+            closeButton.addActionListener(evt -> {
+                scoresFrame.dispose();
+            });
+            
+            scoresFrame.add(scoresPanel);
+            scoresFrame.pack();
+            scoresFrame.setLocationRelativeTo(null);
+            scoresFrame.setVisible(true);
         });
     }
 
@@ -242,6 +353,8 @@ public class main {
                         final int finalScore = game.getScore();
                         final int snakeSize = game.getSnake().getBody().size();
                         SwingUtilities.invokeLater(() -> {
+                            addHighScore(finalScore);
+                            
                             int choice = JOptionPane.showConfirmDialog(frame, 
                                 "GAME OVER!\nPontuação: " + finalScore + "\nTamanho: " + snakeSize + "\n\nJogar Novamente?", 
                                 "Fim de Jogo", 
@@ -270,14 +383,14 @@ public class main {
 
 class MenuPanel extends JPanel {
     public MenuPanel() {
-        setPreferredSize(new Dimension(800, 650));
+        setPreferredSize(new Dimension(800, 700));
         setBackground(new Color(40, 180, 40));
         setLayout(new BorderLayout());
         
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.Y_AXIS));
         buttonPanel.setOpaque(false);
-        buttonPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 80, 0));
+        buttonPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 60, 0));
         
         JLabel title = new JLabel("SNAKEDASH");
         title.setFont(new Font("Comic Sans MS", Font.BOLD, 58));
@@ -291,6 +404,7 @@ class MenuPanel extends JPanel {
         
         JButton startButton = createMenuButton("INICIAR JOGO");
         JButton skinsButton = createMenuButton("PERSONALIZAR");
+        JButton scoresButton = createMenuButton("RECORDES");
         JButton exitButton = createMenuButton("SAIR");
         
         startButton.addActionListener(evt -> {
@@ -304,6 +418,10 @@ class MenuPanel extends JPanel {
             main.showSkinsMenu(parent);
         });
         
+        scoresButton.addActionListener(evt -> {
+            main.showHighScores();
+        });
+        
         exitButton.addActionListener(evt -> {
             main.stopBackgroundMusic();
             System.exit(0);
@@ -313,11 +431,13 @@ class MenuPanel extends JPanel {
         buttonPanel.add(title);
         buttonPanel.add(Box.createRigidArea(new Dimension(0, 5)));
         buttonPanel.add(subtitle);
-        buttonPanel.add(Box.createRigidArea(new Dimension(0, 60)));
+        buttonPanel.add(Box.createRigidArea(new Dimension(0, 50)));
         buttonPanel.add(startButton);
-        buttonPanel.add(Box.createRigidArea(new Dimension(0, 25)));
+        buttonPanel.add(Box.createRigidArea(new Dimension(0, 20)));
         buttonPanel.add(skinsButton);
-        buttonPanel.add(Box.createRigidArea(new Dimension(0, 25)));
+        buttonPanel.add(Box.createRigidArea(new Dimension(0, 20)));
+        buttonPanel.add(scoresButton);
+        buttonPanel.add(Box.createRigidArea(new Dimension(0, 20)));
         buttonPanel.add(exitButton);
         buttonPanel.add(Box.createVerticalGlue());
         
@@ -336,7 +456,7 @@ class MenuPanel extends JPanel {
         button.setForeground(Color.WHITE);
         button.setBackground(new Color(255, 50, 50));
         button.setAlignmentX(Component.CENTER_ALIGNMENT);
-        button.setMaximumSize(new Dimension(350, 70));
+        button.setMaximumSize(new Dimension(350, 65));
         button.setFocusPainted(false);
         button.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
         
@@ -357,6 +477,5 @@ class MenuPanel extends JPanel {
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-        // Fundo limpo sem bolas
     }
 }

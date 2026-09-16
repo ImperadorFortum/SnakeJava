@@ -11,6 +11,7 @@ public class main {
     private static Clip gameStartSound;
     private static final String HIGH_SCORES_FILE = "highscores.dat";
     private static ArrayList<Integer> highScores = new ArrayList<>();
+    private static Difficulty selectedDifficulty = Difficulty.NORMAL;
 
     public static void main(String[] args) {
         loadHighScores();
@@ -67,14 +68,15 @@ public class main {
     }
     private static void loadSounds() {
         try {
-            File backgroundFile = new File("view\\musica.waw\\MUSICA_DE_FUNDO.wav");
-            File eatingFile = new File("view\\musica.waw\\SOM-MAÇA.wav");
-            File startFile = new File("view\\musica.waw\\INICIO_DE_JOGO.wav");
-            
+            File backgroundFile = new File("SnakeJava\\view\\musica.waw\\MUSICA_DE_FUNDO.wav");
+            File eatingFile = new File("SnakeJava\\view\\musica.waw\\SOM-MAÇA.wav");
+            File startFile = new File("SnakeJava\\view\\musica.waw\\INICIO_DE_JOGO.wav");
+
             System.out.println("Carregando arquivos de áudio...");
             System.out.println("Música fundo existe: " + backgroundFile.exists());
             System.out.println("Som maçã existe: " + eatingFile.exists());
             System.out.println("Som início existe: " + startFile.exists());
+
             
             if (backgroundFile.exists()) {
                 AudioInputStream audioStream = AudioSystem.getAudioInputStream(backgroundFile);
@@ -333,6 +335,7 @@ public class main {
                 protected void gameOver() {
                 }
             };
+            game.setDifficulty(selectedDifficulty);
             game.setup();
             GamePanel panel = new GamePanel(game, renderer);
             panel.setSnake(game.getSnake());
@@ -371,7 +374,7 @@ public class main {
                     }
                     panel.repaint();
                     try {
-                        Thread.sleep(100);
+                        Thread.sleep(game.getDifficulty().getDelay());
                     } catch (InterruptedException ex) {
                         Thread.currentThread().interrupt();
                     }
@@ -379,6 +382,53 @@ public class main {
             }).start();
         });
     }
+    public static void showDifficultyMenu() {
+    String[] options = {
+        "Fácil ",
+        "Normal ",
+        "Médio ",
+        "Difícil "
+    };
+
+    int choice = JOptionPane.showOptionDialog(
+        null,
+        "Selecione a dificuldade:",
+        "Dificuldade - SnakeDash",
+        JOptionPane.DEFAULT_OPTION,
+        JOptionPane.QUESTION_MESSAGE,
+        null,
+        options,
+        options[1]
+    );
+
+    switch (choice) {
+        case 0:
+            selectedDifficulty = Difficulty.FACIL;
+            break;
+
+        case 1:
+            selectedDifficulty = Difficulty.NORMAL;
+            break;
+
+        case 2:
+            selectedDifficulty = Difficulty.MEDIO;
+            break;
+
+        case 3:
+            selectedDifficulty = Difficulty.DIFICIL;
+            break;
+
+        default:
+            return;
+    }
+
+    JOptionPane.showMessageDialog(
+        null,
+        "Dificuldade selecionada: " + selectedDifficulty,
+        "Dificuldade",
+        JOptionPane.INFORMATION_MESSAGE
+    );
+}
 }
 
 class MenuPanel extends JPanel {
@@ -405,6 +455,7 @@ class MenuPanel extends JPanel {
         JButton startButton = createMenuButton("INICIAR JOGO");
         JButton skinsButton = createMenuButton("PERSONALIZAR");
         JButton scoresButton = createMenuButton("RECORDES");
+        JButton difficultyButton = createMenuButton("DIFICULDADE");
         JButton exitButton = createMenuButton("SAIR");
         
         startButton.addActionListener(evt -> {
@@ -422,6 +473,10 @@ class MenuPanel extends JPanel {
             main.showHighScores();
         });
         
+        difficultyButton.addActionListener(evt -> {
+            main.showDifficultyMenu();
+        });
+        
         exitButton.addActionListener(evt -> {
             main.stopBackgroundMusic();
             System.exit(0);
@@ -437,6 +492,8 @@ class MenuPanel extends JPanel {
         buttonPanel.add(skinsButton);
         buttonPanel.add(Box.createRigidArea(new Dimension(0, 20)));
         buttonPanel.add(scoresButton);
+        buttonPanel.add(Box.createRigidArea(new Dimension(0, 20)));
+        buttonPanel.add(difficultyButton);
         buttonPanel.add(Box.createRigidArea(new Dimension(0, 20)));
         buttonPanel.add(exitButton);
         buttonPanel.add(Box.createVerticalGlue());
@@ -478,4 +535,5 @@ class MenuPanel extends JPanel {
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
     }
+
 }

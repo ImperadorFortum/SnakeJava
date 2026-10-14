@@ -66,44 +66,48 @@ public class main {
     public static ArrayList<Integer> getHighScores() {
         return highScores;
     }
-    private static void loadSounds() {
+       private static void loadSounds() {
         try {
-        File backgroundFile = new File("view/musica.waw/MUSICA_DE_FUNDO.wav");
-        File eatingFile     = new File("view/musica.waw/SOM-MAÇA.wav");
-        File startFile      = new File("view/musica.waw/INICIO_DE_JOGO.wav");
+            java.net.URL backgroundFile = main.class.getResource("/view/musica.waw/MUSICA_DE_FUNDO.wav");
+            java.net.URL eatingFile     = main.class.getResource("/view/musica.waw/SOM-MAÇA.wav");
+            java.net.URL startFile      = main.class.getResource("/view/musica.waw/INICIO_DE_JOGO.wav");
 
             System.out.println("Carregando arquivos de áudio...");
-            System.out.println("Música fundo existe: " + backgroundFile.exists());
-            System.out.println("Som maçã existe: " + eatingFile.exists());
-            System.out.println("Som início existe: " + startFile.exists());
+            System.out.println("Música fundo existe: " + (backgroundFile != null));
+            System.out.println("Som maçã existe: "     + (eatingFile != null));
+            System.out.println("Som início existe: "   + (startFile != null));
 
-            
-            if (backgroundFile.exists()) {
+            // 1. Carrega a Música de Fundo
+            if (backgroundFile != null) {
                 AudioInputStream audioStream = AudioSystem.getAudioInputStream(backgroundFile);
                 backgroundMusic = AudioSystem.getClip();
                 backgroundMusic.open(audioStream);
                 System.out.println("Música de fundo carregada!");
             }
-            
-            if (eatingFile.exists()) {
+
+            // 2. Carrega o Som da Maçã
+            if (eatingFile != null) {
                 AudioInputStream audioStream = AudioSystem.getAudioInputStream(eatingFile);
                 eatingSound = AudioSystem.getClip();
                 eatingSound.open(audioStream);
                 System.out.println("Som da maçã carregado!");
             }
-            
-            if (startFile.exists()) {
+
+            // 3. Alvo corrigido para 'gameStartSound' (Apenas carrega, não toca!)
+            if (startFile != null) {
                 AudioInputStream audioStream = AudioSystem.getAudioInputStream(startFile);
                 gameStartSound = AudioSystem.getClip();
                 gameStartSound.open(audioStream);
-                System.out.println("Som de início carregado!");
+                System.out.println("Som de início preparado com sucesso!");
             }
-            
+
         } catch (Exception e) {
-            System.err.println("Erro ao carregar arquivos de áudio: " + e.getMessage());
+            System.out.println("Erro ao carregar os áudios:");
             e.printStackTrace();
         }
     }
+
+
 
     public static void playBackgroundMusic() {
         if (backgroundMusic != null) {
